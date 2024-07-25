@@ -15,5 +15,5 @@ The purpose of this project is to understand C2 servers in depth and expand my d
 ### Development Environment
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your_username/C2-Server-Project.git
+   git clone https://github.com/cwsecur1ty/C2-Server-Project.git
    cd C2-Server-Project
