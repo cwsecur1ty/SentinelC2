@@ -1,7 +1,7 @@
 import socket
 
 # Server configuration
-SERVER_HOST = '18.134.157.253'  # Replace with your server's IP address
+SERVER_HOST = '1.1.1.1'  # Replace with your server's IP address
 SERVER_PORT = 9999
 
 def connect_to_server():
