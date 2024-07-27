@@ -18,3 +18,6 @@ This project aims to understand C2 servers in depth and expand my defensive skil
    ```sh
    git clone https://github.com/cwsecur1ty/C2-Server.git
    cd C2-Server-Project
+
+### Tests/Examples
+1. ![test_string_result](https://github.com/user-attachments/assets/d5358548-1954-4e83-a4ae-a85963f2e303)
