@@ -30,8 +30,9 @@ def handle_client(client_socket, addr):
                     if os.path.exists(filepath):
                         client_socket.sendall(f'upload {os.path.basename(filepath)}'.encode())
                         with open(filepath, 'rb') as f:
-                            data = f.read()
-                            client_socket.sendall(data)
+                            while (data := f.read(4096)):
+                                client_socket.sendall(data)
+                        client_socket.sendall(b'EOF')
                         print(f"[*] Uploaded {filepath}")
                     else:
                         print(f"[!] File {filepath} does not exist")
@@ -41,10 +42,12 @@ def handle_client(client_socket, addr):
                     client_socket.sendall(command.encode())
                     filename = command.split(' ', 1)[1]
                     with open(filename, 'wb') as f:
-                        data = client_socket.recv(4096)
-                        while data:
-                            f.write(data)
+                        while True:
                             data = client_socket.recv(4096)
+                            if data.endswith(b'EOF'):
+                                f.write(data[:-3])
+                                break
+                            f.write(data)
                     print(f"[*] Downloaded {filename}")
                 
                 else:

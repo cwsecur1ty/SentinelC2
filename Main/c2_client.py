@@ -35,18 +35,21 @@ def connect_to_server():
             if command.startswith('upload'):
                 _, filename = command.split(' ', 1)
                 with open(filename, 'wb') as f:
-                    data = client.recv(4096)
-                    while data:
-                        f.write(data)
+                    while True:
                         data = client.recv(4096)
+                        if data.endswith(b'EOF'):
+                            f.write(data[:-3])
+                            break
+                        f.write(data)
                 print(f"[*] Received and saved {filename}")
 
             elif command.startswith('download'):
                 filename = command.split(' ', 1)[1]
                 if os.path.exists(filename):
                     with open(filename, 'rb') as f:
-                        data = f.read()
-                        client.sendall(data)
+                        while (data := f.read(4096)):
+                            client.sendall(data)
+                    client.sendall(b'EOF')
                 else:
                     client.sendall(f"File {filename} not found.".encode())
 
