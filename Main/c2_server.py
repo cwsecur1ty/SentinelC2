@@ -13,6 +13,11 @@ def start_server():
     while True:
         client_socket, addr = server.accept()
         print(f"[*] Accepted connection from {addr[0]}:{addr[1]}")
+        
+        # Receive and print system information from the client
+        system_info = client_socket.recv(4096).decode('utf-8')
+        print(f"[*] System Information:\n{system_info}")
+
         handle_client(client_socket)
 
 def handle_client(client_socket):
