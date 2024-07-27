@@ -26,3 +26,4 @@ This project aims to understand C2 servers in depth and expand my defensive skil
 ![test_string_result](https://github.com/user-attachments/assets/d5358548-1954-4e83-a4ae-a85963f2e303)
 
 #### Example command & output, where the command is sent from the C2 Server to the C2 Client.
+![test_string_result2](https://github.com/user-attachments/assets/9d27f1aa-b11d-4e00-adee-52e640820317)
