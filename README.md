@@ -19,5 +19,7 @@ This project aims to understand C2 servers in depth and expand my defensive skil
    git clone https://github.com/cwsecur1ty/C2-Server.git
    cd C2-Server-Project
 
-## Example console output on the C2 Server from receiving connection from the client (victim). 
+## Examples & Test (Photos)
+
+#### Example console output on the C2 Server from receiving connection from the client (victim). 
 ![test_string_result](https://github.com/user-attachments/assets/d5358548-1954-4e83-a4ae-a85963f2e303)
