@@ -5,6 +5,7 @@ This project aims to understand C2 servers in depth and expand my defensive skil
 
 ## Requirements
 - Python 3.x
+   - pip cryptography   
 - AWS account for deployment (Free Tier)
 
 ## Setup
