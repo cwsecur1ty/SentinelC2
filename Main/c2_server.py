@@ -89,6 +89,8 @@ def update_client_file():
     with open(payload_path, 'w') as file:
         file.write(updated_content)
 
+    print(f"[*] Updated {PAYLOAD_FILENAME} with server IP: {HOST}")
+
 def start_http_server():
     update_client_file()  # Update the client file before serving
     payload_path = os.path.join(os.path.dirname(__file__), 'Stagers', PAYLOAD_FILENAME)
