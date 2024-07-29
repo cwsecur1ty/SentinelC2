@@ -1,0 +1,5 @@
+{
+    "server_host": "0.0.0.0",
+    "server_port": 9999,
+    "log_file": "c2_server.log"
+}
