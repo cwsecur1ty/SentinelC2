@@ -74,6 +74,7 @@ def start_listener():
 
 def update_client_file():
     payload_path = os.path.join(os.path.dirname(__file__), 'Stagers', PAYLOAD_FILENAME)
+    print(f"[*] Updating file at: {payload_path}")  # Debugging line
     
     if not os.path.isfile(payload_path):
         print(f"[!] Payload file not found: {payload_path}")
@@ -94,6 +95,7 @@ def update_client_file():
 def start_http_server():
     update_client_file()  # Update the client file before serving
     payload_path = os.path.join(os.path.dirname(__file__), 'Stagers', PAYLOAD_FILENAME)
+    print(f"[*] Serving files from: {os.path.dirname(payload_path)}")  # Debugging line
     
     if not os.path.isfile(payload_path):
         print(f"[!] Payload file not found: {payload_path}")
