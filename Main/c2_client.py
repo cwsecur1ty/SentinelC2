@@ -3,7 +3,7 @@ import os
 import platform
 
 # Server configuration
-SERVER_HOST = 'your_server_ip'  # Replace 'your_server_ip' with the actual IP address of your server
+SERVER_HOST = '18.169.51.175'  # Replace 'your_server_ip' with the actual IP address of your server
 SERVER_PORT = 9999
 
 def get_system_info():
