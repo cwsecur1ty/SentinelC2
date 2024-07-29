@@ -80,15 +80,29 @@ def update_client_file():
         print(f"[!] Payload file not found: {payload_path}")
         return
 
-    with open(payload_path, 'r') as file:
-        content = file.read()
+    try:
+        with open(payload_path, 'r') as file:
+            content = file.read()
+    except Exception as e:
+        print(f"[!] Error reading file: {e}")
+        return
+
+    # Ensure that the search string exists in the content before replacing
+    search_string = "SERVER_HOST = '1.1.1.1'"
+    if search_string not in content:
+        print(f"[!] Search string not found in the file.")
+        return
 
     updated_content = content.replace(
-        "SERVER_HOST = '1.1.1.1'", f"SERVER_HOST = '{HOST}'"
+        search_string, f"SERVER_HOST = '{HOST}'"
     )
 
-    with open(payload_path, 'w') as file:
-        file.write(updated_content)
+    try:
+        with open(payload_path, 'w') as file:
+            file.write(updated_content)
+    except Exception as e:
+        print(f"[!] Error writing to file: {e}")
+        return
 
     print(f"[*] Updated {PAYLOAD_FILENAME} with server IP: {HOST}")
 
