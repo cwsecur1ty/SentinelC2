@@ -2,13 +2,19 @@ import socket
 import threading
 import logging
 import os
+import json
 
-# Server configuration
-HOST = '0.0.0.0'
-PORT = 9999
+# Load configuration
+config_path = os.path.join(os.path.dirname(__file__), '../config/config.json')
+with open(config_path) as config_file:
+    config = json.load(config_file)
+
+HOST = config['server_host']
+PORT = config['server_port']
+LOG_FILE = config['log_file']
 
 # Configure logging
-logging.basicConfig(filename='c2_server.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(message)s')
 
 # Store connected clients
 clients = {}
