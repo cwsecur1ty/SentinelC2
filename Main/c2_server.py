@@ -63,7 +63,6 @@ def start_listener():
         client_handler.start()
 
 def start_http_server():
-    # Update payload path to include /Stagers directory
     payload_path = os.path.join(os.path.dirname(__file__), 'Stagers', PAYLOAD_FILENAME)
     
     if not os.path.isfile(payload_path):
