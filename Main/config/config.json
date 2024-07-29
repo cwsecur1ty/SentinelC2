@@ -2,6 +2,6 @@
     "server_host": "0.0.0.0",
     "server_port": 9999,
     "log_file": "c2_server.log",
-    "payload_filename": "python_stager.py"
-  }
-  
+    "payload_filename": "python_stager.py",
+    "http_port": 80
+}
