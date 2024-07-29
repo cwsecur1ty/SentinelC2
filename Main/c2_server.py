@@ -15,11 +15,12 @@ HOST = config['server_host']
 PORT = config['server_port']
 LOG_FILE = config['log_file']
 PAYLOAD_FILENAME = config['payload_filename']
+HTTP_PORT = config['http_port']
 
 # Configure logging
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(message)s')
 
-# Store connected clients
+# Store connected clients and groups
 clients = {}
 client_groups = {}
 
@@ -71,8 +72,8 @@ def start_http_server():
 
     os.chdir(os.path.dirname(payload_path))
     handler = http.server.SimpleHTTPRequestHandler
-    httpd = socketserver.TCPServer(("", 80), handler)
-    print("[*] Starting HTTP server on port 80")
+    httpd = socketserver.TCPServer(("", HTTP_PORT), handler)
+    print(f"[*] Starting HTTP server on port {HTTP_PORT}")
     httpd.serve_forever()
 
 def show_menu():
@@ -148,12 +149,15 @@ def interact_with_client_group():
         print(f"[!] No group with name: {group_name}")
 
 if __name__ == "__main__":
-    listener_thread = threading.Thread(target=start_listener)
-    listener_thread.daemon = True
-    listener_thread.start()
-
+    # Start the HTTP server in a separate thread
     http_thread = threading.Thread(target=start_http_server)
     http_thread.daemon = True
     http_thread.start()
 
+    # Start the socket listener in a separate thread
+    listener_thread = threading.Thread(target=start_listener)
+    listener_thread.daemon = True
+    listener_thread.start()
+
+    # Show the menu
     show_menu()
