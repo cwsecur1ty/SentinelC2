@@ -44,9 +44,6 @@ This project aims to better my understanding of Command and Control (C2) servers
 
 ## Examples & Test (Photos)
 
-#### Example console output on the C2 Server from receiving connection from the client (victim). 
-![test_string_result](https://github.com/user-attachments/assets/d5358548-1954-4e83-a4ae-a85963f2e303)
-
 #### Example console command with output, and downloading of a specified file.#
 ![test_string_result3](https://github.com/user-attachments/assets/db6ca58b-77d7-4913-bdcc-ef936f4bfd07)
 
