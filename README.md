@@ -47,8 +47,10 @@ This project aims to better my understanding of Command and Control (C2) servers
 #### Example console output on the C2 Server from receiving connection from the client (victim). 
 ![test_string_result](https://github.com/user-attachments/assets/d5358548-1954-4e83-a4ae-a85963f2e303)
 
-#### Example command & output, where the command is sent from the C2 Server to the C2 Client.
-![test_string_result2](https://github.com/user-attachments/assets/9d27f1aa-b11d-4e00-adee-52e640820317)
-
 #### Example console command with output, and downloading of a specified file.#
 ![test_string_result3](https://github.com/user-attachments/assets/db6ca58b-77d7-4913-bdcc-ef936f4bfd07)
+
+#### Example of the client running the python_stager (right-hand side) and then executing c2_client.py, and finally the server receiving the connection (left-hand side).
+![test_string_result4](https://github.com/user-attachments/assets/b4e2c6bd-862a-47f6-9154-9580db8de8a6)
+
+
