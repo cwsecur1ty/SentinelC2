@@ -5,13 +5,23 @@ import socket
 import json
 import os
 import logging
+import urllib.request
 
 # Correct path to configuration file
 config_path = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
 with open(config_path) as config_file:
     config = json.load(config_file)
 
-HOST = config['server_host']
+# Fetch public IP address
+def get_public_ip():
+    try:
+        public_ip = urllib.request.urlopen('https://api.ipify.org').read().decode('utf8')
+        return public_ip
+    except Exception as e:
+        logging.error(f"Error fetching public IP: {e}")
+        return None
+
+HOST = get_public_ip() if config['server_host'] == '0.0.0.0' else config['server_host']
 PORT = config['server_port']
 LOG_FILE = config['log_file']
 PAYLOAD_FILENAME = config['payload_filename']
