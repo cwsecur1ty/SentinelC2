@@ -80,7 +80,7 @@ def update_client_file():
 
     search_replace_pairs = {
         'c2_client.py': ("SERVER_HOST = '1.1.1.1'", f"SERVER_HOST = '{HOST}'"),
-        'python_stager.py': ("http://0.0.0.0/c2_client.py", f"http://{HOST}/c2_client.py")
+        'python_stager.py': ("http://1.1.1.1/c2_client.py", f"http://{HOST}/c2_client.py")
     }
     
     for file_path in files_to_update:
