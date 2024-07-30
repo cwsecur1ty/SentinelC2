@@ -78,9 +78,19 @@ def update_client_file():
         os.path.join(os.path.dirname(__file__), 'Stagers', 'python_stager.py')
     ]
 
-    search_string = "SERVER_HOST = '1.1.1.1'"
+    search_replace_pairs = {
+        'c2_client.py': ("SERVER_HOST = '0.0.0.0'", f"SERVER_HOST = '{HOST}'"),
+        'python_stager.py': ("http://1.1.1.1/c2_client.py", f"http://{HOST}/c2_client.py")
+    }
     
     for file_path in files_to_update:
+        filename = os.path.basename(file_path)
+        if filename not in search_replace_pairs:
+            print(f"[!] No replacement rules found for {filename}.")
+            continue
+
+        search_string, replace_string = search_replace_pairs[filename]
+
         print(f"[*] Updating file at: {file_path}")
 
         if not os.path.isfile(file_path):
@@ -96,12 +106,10 @@ def update_client_file():
             continue
 
         if search_string not in content:
-            print(f"[!] Search string not found in the file {file_path}.")
+            print(f"[!] Search string '{search_string}' not found in the file {file_path}.")
             continue
 
-        updated_content = content.replace(
-            search_string, f"SERVER_HOST = '{HOST}'"
-        )
+        updated_content = content.replace(search_string, replace_string)
         print(f"[*] Updated content for {file_path}:\n{updated_content[:200]}...")  # Print first 200 chars for inspection
 
         try:
@@ -112,6 +120,7 @@ def update_client_file():
             continue
 
         print(f"[*] Updated {file_path} with server IP: {HOST}")
+
 
 
 def start_http_server():
