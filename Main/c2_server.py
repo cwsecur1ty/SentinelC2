@@ -90,6 +90,7 @@ def update_client_file():
         try:
             with open(file_path, 'r') as file:
                 content = file.read()
+            print(f"[*] Original content from {file_path}:\n{content[:200]}...")  # Print first 200 chars for inspection
         except Exception as e:
             print(f"[!] Error reading file {file_path}: {e}")
             continue
@@ -101,6 +102,7 @@ def update_client_file():
         updated_content = content.replace(
             search_string, f"SERVER_HOST = '{HOST}'"
         )
+        print(f"[*] Updated content for {file_path}:\n{updated_content[:200]}...")  # Print first 200 chars for inspection
 
         try:
             with open(file_path, 'w') as file:
@@ -110,6 +112,7 @@ def update_client_file():
             continue
 
         print(f"[*] Updated {file_path} with server IP: {HOST}")
+
 
 def start_http_server():
     update_client_file()  # Update the client file before serving
